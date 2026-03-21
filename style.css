@@ -168,16 +168,15 @@ body {
 }
 
 .page-wrapper {
-  width: 100%;
-  max-width: 100%;
-  flex-shrink: 0;
-  margin-bottom: 1rem;
+  display: inline-block;
+  width: auto;
+  vertical-align: top;
+  margin: 0;
 }
 
 .verovio-output svg {
-  max-width: 100%;
-  height: auto;
   display: block;
+  max-width: 100%;
   filter: drop-shadow(0 2px 12px rgba(0,0,0,.15));
 }
 

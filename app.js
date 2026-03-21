@@ -119,14 +119,17 @@ function detectFormat(filename, content) {
 }
 
 /* ── Apply Verovio options ────────────────────────────────── */
-function applyOptions(format) {
+function applyOptions(format, pageWidth) {
   const inputFrom = format === 'mei'       ? 'mei'
                   : format === 'lilypond'  ? 'lilypond'
                   : 'musicxml';
 
+  const pw = pageWidth || Math.round(window.innerWidth * 0.95);
+
   state.vrvToolkit.setOptions({
     inputFrom,
-    scale:           state.zoom,
+    scale:           100,
+    pageWidth:       pw,
     adjustPageWidth: true,
     breaks:          'auto',
     svgHtml5:        true,
@@ -162,6 +165,18 @@ async function renderScore(content, filename, format) {
       throw new Error('Verovio n\'a pas pu charger le fichier.\n' + (log || 'Log vide.'));
     }
 
+    const pageWidth = Math.round(window.innerWidth * 0.95);
+    state.vrvToolkit.setOptions({
+      scale: 100,
+      pageWidth: pageWidth,
+      adjustPageWidth: true,
+      breaks: 'auto',
+      svgHtml5: true,
+      svgViewBox: true,
+      footer: 'none',
+      header: 'none',
+    });
+
     state.pageCount = state.vrvToolkit.getPageCount();
     console.log('[Partitura]', filename, '— pages :', state.pageCount, '— format :', format);
 
@@ -177,22 +192,6 @@ async function renderScore(content, filename, format) {
 
     renderAllPages();
     showScoreContainer(filename, format);
-
-    await tick();
-    const containerWidth = els.verovioOutput.clientWidth - 32;
-    const containerHeight = els.verovioOutput.clientHeight - 32;
-    const defaultPageWidth = 2220;
-    const defaultPageHeight = 2970;
-    const scaleByWidth = Math.round((containerWidth / defaultPageWidth) * 100);
-    const scaleByHeight = Math.round((containerHeight / defaultPageHeight) * 100);
-    const autoScale = Math.max(scaleByWidth, scaleByHeight);
-    state.zoom = Math.max(20, Math.min(100, autoScale));
-    els.zoomLabel.textContent = state.zoom + '%';
-
-    state.vrvToolkit.setOptions({ scale: state.zoom });
-    state.vrvToolkit.redoLayout({});
-    state.pageCount = state.vrvToolkit.getPageCount();
-    renderAllPages();
 
   } catch (err) {
     console.error('[Partitura] Erreur rendu :', err);
@@ -215,8 +214,7 @@ function renderAllPages() {
     wrapper.innerHTML = svg;
     const svgEl = wrapper.querySelector('svg');
     if (svgEl) {
-      svgEl.style.width = '100%';
-      svgEl.style.height = 'auto';
+      // Width/height will be overridden by CSS width: 100% !important
     }
     els.verovioOutput.appendChild(wrapper);
   }
@@ -244,10 +242,20 @@ function setZoom(newZoom) {
   els.zoomLabel.textContent = state.zoom + '%';
 
   if (state.vrvReady && state.currentContent) {
-    state.vrvToolkit.setOptions({ scale: state.zoom });
+    const baseWidth = Math.round(window.innerWidth * 0.95);
+    const pageWidth = Math.round(baseWidth * (100 / state.zoom));
+    
+    state.vrvToolkit.setOptions({ 
+      scale: 100,
+      pageWidth: pageWidth
+    });
     state.vrvToolkit.redoLayout({});
     state.pageCount = state.vrvToolkit.getPageCount();
     renderAllPages();
+    if (state.currentPage > state.pageCount) {
+      state.currentPage = state.pageCount;
+    }
+    showPage(state.currentPage);
   }
 }
 
@@ -365,8 +373,8 @@ document.addEventListener('drop', e => {
   if (file) handleFile(file);
 });
 
-els.btnZoomIn.addEventListener('click',  () => setZoom(state.zoom + 10));
-els.btnZoomOut.addEventListener('click', () => setZoom(state.zoom - 10));
+els.btnZoomIn.addEventListener('click',  () => setZoom(state.zoom + 5));
+els.btnZoomOut.addEventListener('click', () => setZoom(state.zoom - 5));
 
 els.btnErrorRetry.addEventListener('click', () => {
   hideError();
