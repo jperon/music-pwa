@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0f0e17" />
+  <meta name="description" content="Lecteur de partitions musicales — MusicXML, MEI, LilyPond" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Partitura" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" type="image/svg+xml" href="icon.svg" />
+  <link rel="apple-touch-icon" href="icon-192.png" />
+  <title>Partitura</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300,1,400&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<div id="app">
+
+  <!-- Drop Zone -->
+  <main id="main">
+    <div id="drop-zone" class="drop-zone" role="button" tabindex="0" aria-label="Zone de dépôt de fichier musical">
+      <div class="drop-inner">
+        <div class="drop-icon">𝄞</div>
+        <p class="drop-title">Ouvrez une partition</p>
+        <p class="drop-sub">Glissez un fichier ou cliquez pour parcourir</p>
+        <p class="drop-formats">MusicXML · MEI · LilyPond (.ly)</p>
+        <button class="btn-open" id="btn-browse">Parcourir…</button>
+        <input type="file" id="file-input" accept=".xml,.musicxml,.mxl,.mei,.ly,.ily" hidden />
+      </div>
+    </div>
+
+    <!-- Score Viewer -->
+    <div id="score-container" class="score-container hidden">
+      <div id="verovio-output" class="verovio-output"></div>
+    </div>
+
+    <!-- Loading -->
+    <div id="loading" class="loading hidden">
+      <div class="loading-spinner"></div>
+      <p class="loading-text">Rendu en cours…</p>
+    </div>
+
+    <!-- Error -->
+    <div id="error-box" class="error-box hidden">
+      <div class="error-icon">⚠</div>
+      <p id="error-msg" class="error-msg"></p>
+      <button class="btn-open" id="btn-error-retry">Réessayer</button>
+    </div>
+  </main>
+
+  <!-- Bottom bar -->
+  <footer id="bottom-bar">
+    <button id="btn-zoom-out" class="icon-btn" title="Dézoomer" aria-label="Dézoomer">−</button>
+    <span id="zoom-label" class="zoom-label">100%</span>
+    <button id="btn-zoom-in" class="icon-btn" title="Zoomer" aria-label="Zoomer">+</button>
+    <span class="page-nav">
+      <button id="btn-page-prev" class="icon-btn" title="Page précédente" aria-label="Page précédente" disabled>‹</button>
+      <span id="page-label" class="zoom-label">—</span>
+      <button id="btn-page-next" class="icon-btn" title="Page suivante" aria-label="Page suivante" disabled>›</button>
+    </span>
+    <span class="footer-spacer"></span>
+    <button class="footer-link" id="btn-open-new">Ouvrir</button>
+  </footer>
+
+</div>
+
+<!-- Notification toast -->
+<div id="toast" class="toast" role="alert" aria-live="polite"></div>
+
+<!-- Scripts -->
+<script src="verovio-toolkit-wasm.js" defer></script>
+<script src="app.js" defer></script>
+</body>
+</html>
