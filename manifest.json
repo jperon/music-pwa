@@ -2,7 +2,7 @@
   "name": "Partitura — Lecteur de Partitions",
   "short_name": "Partitura",
   "description": "Lecteur de partitions musicales : MusicXML, MEI, LilyPond. Propulsé par Verovio.",
-  "start_url": "/",
+  "start_url": "/music-pwa/",
   "display": "standalone",
   "background_color": "#0f0e17",
   "theme_color": "#0f0e17",
