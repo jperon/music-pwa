@@ -7,6 +7,21 @@
 'use strict';
 
 /* ── State ────────────────────────────────────────────────── */
+const STORAGE_KEY = 'partitura_zoom';
+
+function loadZoom() {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    const parsed = parseInt(saved, 10);
+    if (parsed >= 10 && parsed <= 200) return parsed;
+    return window.innerHeight > window.innerWidth ? 50 : 100;
+  } catch { return 100; }
+}
+
+function saveZoom(zoom) {
+  try { localStorage.setItem(STORAGE_KEY, String(zoom)); } catch {}
+}
+
 const state = {
   vrvToolkit: null,
   vrvReady: false,
@@ -16,7 +31,7 @@ const state = {
   currentContent: null,
   pageCount: 0,
   currentPage: 1,
-  zoom: 100,
+  zoom: loadZoom(),
 };
 
 /* ── DOM refs ─────────────────────────────────────────────── */
@@ -239,6 +254,7 @@ function showPage(pageNum) {
 /* ── Zoom ─────────────────────────────────────────────────── */
 function setZoom(newZoom) {
   state.zoom = Math.max(10, Math.min(200, newZoom));
+  saveZoom(state.zoom);
   els.zoomLabel.textContent = state.zoom + '%';
 
   if (state.vrvReady && state.currentContent) {
@@ -417,15 +433,6 @@ els.verovioOutput.addEventListener('touchend', e => {
     els.fileInput.click();
   }
 });
-
-/* ── Service Worker ───────────────────────────────────────── */
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js')
-      .then(r  => console.log('[Partitura] SW :', r.scope))
-      .catch(e => console.warn('[Partitura] SW échoué :', e));
-  });
-}
 
 /* ── Bootstrap ────────────────────────────────────────────── */
 (async () => {

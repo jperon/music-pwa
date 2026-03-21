@@ -74,5 +74,14 @@
 <!-- Scripts -->
 <script src="verovio-toolkit-wasm.js" defer></script>
 <script src="app.js" defer></script>
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js')
+        .then(r  => console.log('[Partitura] SW :', r.scope))
+        .catch(e => console.warn('[Partitura] SW échoué :', e));
+    });
+  }
+</script>
 </body>
 </html>
